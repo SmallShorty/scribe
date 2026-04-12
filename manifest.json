@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Scribe",
+  "version": "2.0.0",
+  "description": "VK message editor",
+  "permissions": ["activeTab", "scripting", "tabs"],
+  "host_permissions": ["https://vk.com/*", "https://*.vk.com/*"],
+  "background": {
+    "service_worker": "src/background/index.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://vk.com/*", "https://*.vk.com/*"],
+      "js": ["src/content/index.ts"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/editor/index.html"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "icons": {
+    "16": "icon.svg",
+    "48": "icon.svg",
+    "128": "icon.svg"
+  }
+}

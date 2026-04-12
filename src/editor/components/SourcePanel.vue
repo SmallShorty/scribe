@@ -1,0 +1,113 @@
+<template>
+  <div class="panel source-panel">
+    <div class="panel-header">
+      <span class="panel-label">Исходное сообщение</span>
+      <n-button size="tiny" quaternary @click="copyText">
+        <template #icon>
+          <n-icon :component="IconCopy" />
+        </template>
+        Копировать
+      </n-button>
+    </div>
+
+    <n-scrollbar class="panel-body">
+      <p v-if="!store.sourceText" class="empty-hint">
+        (нет текста)
+      </p>
+      <p v-else class="message-text">{{ store.sourceText }}</p>
+    </n-scrollbar>
+
+    <div class="panel-footer">
+      <n-space :size="16">
+        <span class="stat">{{ store.charCount }}&nbsp;симв.</span>
+        <span class="stat">{{ store.wordCount }}&nbsp;слов</span>
+        <span class="stat">{{ formattedTime }}</span>
+      </n-space>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed, h, type Component } from 'vue'
+import { NButton, NIcon, NScrollbar, NSpace, useMessage } from 'naive-ui'
+import { useMessageStore } from '../stores/message'
+
+const store = useMessageStore()
+const notify = useMessage()
+
+const formattedTime = computed(() =>
+  store.openedAt.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' }),
+)
+
+const IconCopy: Component = () =>
+  h('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 24 24', fill: 'currentColor', width: '1em', height: '1em' }, [
+    h('path', { d: 'M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z' }),
+  ])
+
+async function copyText() {
+  try {
+    await navigator.clipboard.writeText(store.sourceText)
+    notify.success('Скопировано!')
+  } catch {
+    notify.error('Ошибка копирования')
+  }
+}
+</script>
+
+<style scoped>
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: #1a1a1f;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid #2a2a30;
+  flex-shrink: 0;
+}
+
+.panel-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #7c7c8a;
+}
+
+.panel-body {
+  flex: 1;
+  padding: 16px;
+}
+
+.message-text {
+  color: #e0e0e6;
+  font-size: 15px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.empty-hint {
+  color: #4a4a56;
+  font-style: italic;
+  font-size: 14px;
+}
+
+.panel-footer {
+  padding: 8px 16px;
+  border-top: 1px solid #2a2a30;
+  flex-shrink: 0;
+}
+
+.stat {
+  font-size: 11px;
+  color: #56565e;
+  font-variant-numeric: tabular-nums;
+}
+</style>
