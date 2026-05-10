@@ -1,12 +1,8 @@
 import { ref } from 'vue'
 import { useMessageStore } from '../stores/message'
+import { useSettingsStore } from '../stores/settings'
 import { VK_LIMIT } from '../constants'
 import type { MessageAction, MessageResponse } from '../../types/messages'
-
-interface DelayOptions {
-  delayEnabled: boolean
-  delaySec: number
-}
 
 function splitIntoChunks(text: string): string[] {
   const chunks: string[] = []
@@ -20,6 +16,7 @@ function sleep(ms: number) {
 
 export function useSendReply() {
   const store = useMessageStore()
+  const settings = useSettingsStore()
 
   const sending = ref(false)
   const statusMsg = ref('')
@@ -43,7 +40,7 @@ export function useSendReply() {
     })
   }
 
-  async function sendReply(text: string, delay: DelayOptions): Promise<boolean> {
+  async function sendReply(text: string): Promise<boolean> {
     if (!text.trim() || !store.vkTabId || sending.value) return false
 
     const chunks = splitIntoChunks(text)
@@ -52,9 +49,9 @@ export function useSendReply() {
     try {
       for (let i = 0; i < chunks.length; i++) {
         if (i > 0) {
-          if (delay.delayEnabled) {
+          if (settings.delayEnabled) {
             setStatus(`Пауза перед ${i + 1}/${chunks.length}…`, 'success')
-            await sleep(delay.delaySec * 1000)
+            await sleep(settings.delaySec * 1000)
           } else {
             setStatus(`Отправка ${i + 1}/${chunks.length}…`, 'success')
           }

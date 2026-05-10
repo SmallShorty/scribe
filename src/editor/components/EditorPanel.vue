@@ -22,7 +22,6 @@
       </transition>
 
       <div class="footer-right">
-        <DelaySettings v-if="messageCount > 1" ref="delayRef" />
         <div class="stats">
           <span class="stat">{{ replyText.length }}&nbsp;симв.</span>
           <span class="stat">{{ wordCount }}&nbsp;слов</span>
@@ -37,7 +36,6 @@ import { ref, computed, h, type Component } from 'vue'
 import { NButton, NIcon } from 'naive-ui'
 import PanelShell from './layout/PanelShell.vue'
 import ReplyEditor from './editor/ReplyEditor.vue'
-import DelaySettings from './editor/DelaySettings.vue'
 import { useMessageStore } from '../stores/message'
 import { useSendReply } from '../composables/useSendReply'
 import { VK_LIMIT } from '../constants'
@@ -46,7 +44,6 @@ const store = useMessageStore()
 const { sending, statusMsg, statusType, sendReply } = useSendReply()
 
 const replyText = ref('')
-const delayRef = ref<InstanceType<typeof DelaySettings>>()
 
 const messageCount = computed(() => Math.max(1, Math.ceil(replyText.value.length / VK_LIMIT)))
 const wordCount = computed(() => {
@@ -55,10 +52,7 @@ const wordCount = computed(() => {
 })
 
 async function handleSend() {
-  const success = await sendReply(replyText.value, {
-    delayEnabled: delayRef.value?.enabled ?? false,
-    delaySec: delayRef.value?.seconds ?? 3,
-  })
+  const success = await sendReply(replyText.value)
   if (success) replyText.value = ''
 }
 

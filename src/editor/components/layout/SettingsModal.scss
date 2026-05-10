@@ -1,0 +1,76 @@
+@use '@/styles/variables' as v;
+
+:deep(.settings-modal) {
+  width: 380px;
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: v.$gap-lg;
+}
+
+.section-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: v.$text;
+  transition: color 0.2s ease;
+}
+
+.section-desc {
+  font-size: 11px;
+  color: v.$text-dim;
+  margin-top: 2px;
+  transition: color 0.2s ease;
+}
+
+.divider {
+  margin: 20px 0;
+}
+
+.theme-group {
+  width: 100%;
+
+  :deep(.n-radio-button) {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+.radio-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.delay-control {
+  display: flex;
+  align-items: center;
+  gap: v.$gap-sm;
+}
+
+.delay-select {
+  width: 120px;
+}
+
+.delay-input {
+  width: 100px;
+}
+
+.fade-enter-active,
+.fade-leave-active { transition: opacity 0.2s ease; }
+.fade-enter-from,
+.fade-leave-to     { opacity: 0; }
