@@ -17,27 +17,16 @@
       <p v-else class="message-text">{{ store.sourceText }}</p>
     </n-scrollbar>
 
-    <div class="panel-footer">
-      <n-space :size="16">
-        <span class="stat">{{ store.charCount }}&nbsp;симв.</span>
-        <span class="stat">{{ store.wordCount }}&nbsp;слов</span>
-        <span class="stat">{{ formattedTime }}</span>
-      </n-space>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, h, type Component } from 'vue'
-import { NButton, NIcon, NScrollbar, NSpace, useMessage } from 'naive-ui'
+import { h, type Component } from 'vue'
+import { NButton, NIcon, NScrollbar, useMessage } from 'naive-ui'
 import { useMessageStore } from '../stores/message'
 
 const store = useMessageStore()
 const notify = useMessage()
-
-const formattedTime = computed(() =>
-  store.openedAt.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' }),
-)
 
 const IconCopy: Component = () =>
   h('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 24 24', fill: 'currentColor', width: '1em', height: '1em' }, [
@@ -99,15 +88,4 @@ async function copyText() {
   font-size: 14px;
 }
 
-.panel-footer {
-  padding: 8px 16px;
-  border-top: 1px solid #2a2a30;
-  flex-shrink: 0;
-}
-
-.stat {
-  font-size: 11px;
-  color: #56565e;
-  font-variant-numeric: tabular-nums;
-}
 </style>

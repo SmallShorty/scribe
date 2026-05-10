@@ -1,8 +1,7 @@
 <template>
   <div class="panel editor-panel">
     <div class="panel-header">
-      <span class="panel-label">Ответ</span>
-      <span class="char-counter">{{ replyText.length }}</span>
+      <span class="panel-label">Рабочая область</span>
     </div>
 
     <div class="panel-body">
@@ -34,12 +33,17 @@
       <transition name="fade">
         <span v-if="statusMsg" :class="['status', statusType]">{{ statusMsg }}</span>
       </transition>
+
+      <div class="stats">
+        <span class="stat">{{ replyText.length }}&nbsp;симв.</span>
+        <span class="stat">{{ replyWordCount }}&nbsp;слов</span>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, h, type Component } from 'vue'
+import { ref, computed, h, type Component } from 'vue'
 import { NButton, NIcon, NInput } from 'naive-ui'
 import { useMessageStore } from '../stores/message'
 import type { MessageAction, MessageResponse } from '../../types/messages'
@@ -47,6 +51,10 @@ import type { MessageAction, MessageResponse } from '../../types/messages'
 const store = useMessageStore()
 
 const replyText = ref('')
+const replyWordCount = computed(() => {
+  const trimmed = replyText.value.trim()
+  return trimmed ? trimmed.split(/\s+/).length : 0
+})
 const sending = ref(false)
 const statusMsg = ref('')
 const statusType = ref<'success' | 'error'>('success')
@@ -127,12 +135,6 @@ async function sendReply() {
   color: #7c7c8a;
 }
 
-.char-counter {
-  font-size: 11px;
-  color: #56565e;
-  font-variant-numeric: tabular-nums;
-}
-
 .panel-body {
   flex: 1;
   padding: 16px;
@@ -168,6 +170,18 @@ async function sendReply() {
 .hint {
   font-size: 11px;
   color: #46464e;
+}
+
+.stats {
+  margin-left: auto;
+  display: flex;
+  gap: 12px;
+}
+
+.stat {
+  font-size: 11px;
+  color: #56565e;
+  font-variant-numeric: tabular-nums;
 }
 
 .status {
