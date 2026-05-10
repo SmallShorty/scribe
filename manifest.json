@@ -4,7 +4,12 @@
   "version": "2.0.0",
   "description": "VK message editor",
   "permissions": ["activeTab", "scripting", "tabs"],
-  "host_permissions": ["https://vk.com/*", "https://*.vk.com/*"],
+  "host_permissions": [
+    "https://vk.com/*",
+    "https://*.vk.com/*",
+    "https://raw.githubusercontent.com/*",
+    "https://your-server.com/*"
+  ],
   "background": {
     "service_worker": "src/background/index.ts",
     "type": "module"

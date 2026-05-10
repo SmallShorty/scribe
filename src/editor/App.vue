@@ -27,6 +27,7 @@
         </div>
       </div>
       <SettingsModal v-model:show="settingsOpen" />
+      <AnnouncementModal />
     </n-message-provider>
   </n-config-provider>
 </template>
@@ -37,16 +38,22 @@ import { NConfigProvider, NMessageProvider, NSplit } from 'naive-ui'
 import { ruRU, dateRuRU } from 'naive-ui'
 import AppHeader from './components/layout/AppHeader.vue'
 import SettingsModal from './components/settings/SettingsModal.vue'
+import AnnouncementModal from './components/AnnouncementModal.vue'
 import SourcePanel from './components/SourcePanel.vue'
 import EditorPanel from './components/EditorPanel.vue'
 import { useMessageStore } from './stores/message'
 import { useSettingsStore } from './stores/settings'
+import { useAnnouncements } from './composables/useAnnouncements'
 
 const store = useMessageStore()
 const settings = useSettingsStore()
 const settingsOpen = ref(false)
+const { load: loadAnnouncements } = useAnnouncements()
 
-onMounted(() => store.loadFromUrl())
+onMounted(() => {
+  store.loadFromUrl()
+  loadAnnouncements()
+})
 </script>
 
 <style lang="scss" src="./App.scss"></style>

@@ -1,6 +1,12 @@
 <template>
   <PanelShell>
     <template #label>Рабочая область</template>
+    <template #actions>
+      <n-button size="tiny" quaternary :disabled="!replyText" @click="copyText">
+        <template #icon><n-icon :component="IconCopy" /></template>
+        Копировать
+      </n-button>
+    </template>
 
     <ReplyEditor v-model="replyText" class="editor-body" @submit="handleSend" />
 
@@ -33,7 +39,7 @@
 
 <script setup lang="ts">
 import { ref, computed, h, type Component } from 'vue'
-import { NButton, NIcon } from 'naive-ui'
+import { NButton, NIcon, useMessage } from 'naive-ui'
 import PanelShell from './layout/PanelShell.vue'
 import ReplyEditor from './editor/ReplyEditor.vue'
 import { useMessageStore } from '../stores/message'
@@ -42,6 +48,7 @@ import { VK_LIMIT } from '../constants'
 
 const store = useMessageStore()
 const { sending, statusMsg, statusType, sendReply } = useSendReply()
+const notify = useMessage()
 
 const replyText = ref('')
 
@@ -55,6 +62,20 @@ async function handleSend() {
   const success = await sendReply(replyText.value)
   if (success) replyText.value = ''
 }
+
+async function copyText() {
+  try {
+    await navigator.clipboard.writeText(replyText.value)
+    notify.success('Скопировано!')
+  } catch {
+    notify.error('Ошибка копирования')
+  }
+}
+
+const IconCopy: Component = () =>
+  h('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 24 24', fill: 'currentColor', width: '1em', height: '1em' }, [
+    h('path', { d: 'M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z' }),
+  ])
 
 const IconSend: Component = () =>
   h('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 24 24', fill: 'currentColor', width: '1em', height: '1em' }, [

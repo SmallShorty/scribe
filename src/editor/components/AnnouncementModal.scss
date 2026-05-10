@@ -1,0 +1,28 @@
+@use '@/styles/variables' as v;
+
+.announcements {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.announcement {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.announcement-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: v.$text;
+  transition: color 0.2s ease;
+}
+
+.announcement-body {
+  font-size: 13px;
+  color: v.$text-dim;
+  white-space: pre-wrap;
+  line-height: 1.6;
+  transition: color 0.2s ease;
+}
