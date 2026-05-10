@@ -1,27 +1,24 @@
 <template>
-  <div class="panel source-panel">
-    <div class="panel-header">
-      <span class="panel-label">Исходное сообщение</span>
+  <PanelShell variant="source">
+    <template #label>Исходное сообщение</template>
+    <template #actions>
       <n-button size="tiny" quaternary @click="copyText">
-        <template #icon>
-          <n-icon :component="IconCopy" />
-        </template>
+        <template #icon><n-icon :component="IconCopy" /></template>
         Копировать
       </n-button>
-    </div>
+    </template>
 
     <n-scrollbar class="panel-body">
-      <p v-if="!store.sourceText" class="empty-hint">
-        (нет текста)
-      </p>
+      <p v-if="!store.sourceText" class="empty-hint">(нет текста)</p>
       <p v-else class="message-text">{{ store.sourceText }}</p>
     </n-scrollbar>
-  </div>
+  </PanelShell>
 </template>
 
 <script setup lang="ts">
 import { h, type Component } from 'vue'
 import { NButton, NIcon, NScrollbar, useMessage } from 'naive-ui'
+import PanelShell from './layout/PanelShell.vue'
 import { useMessageStore } from '../stores/message'
 
 const store = useMessageStore()
@@ -44,21 +41,6 @@ async function copyText() {
 
 <style lang="scss" scoped>
 @use '@/styles/variables' as v;
-@use '@/styles/mixins' as m;
-
-.panel {
-  @include m.panel-base;
-  background: v.$bg-source;
-  transition: background-color 0.2s ease;
-}
-
-.panel-header {
-  @include m.panel-header;
-}
-
-.panel-label {
-  @include m.panel-label;
-}
 
 .panel-body {
   flex: 1;

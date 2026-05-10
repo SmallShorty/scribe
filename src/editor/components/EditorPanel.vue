@@ -1,32 +1,17 @@
 <template>
-  <div class="panel editor-panel">
-    <div class="panel-header">
-      <span class="panel-label">Рабочая область</span>
-    </div>
+  <PanelShell>
+    <template #label>Рабочая область</template>
 
-    <div class="panel-body">
-      <div
-        ref="editorEl"
-        class="reply-editor"
-        contenteditable="true"
-        spellcheck="true"
-        :data-placeholder="'Введите текст ответа…'"
-        @input="onInput"
-        @paste.prevent="onPaste"
-        @keydown="onKeydown"
-      />
-    </div>
+    <ReplyEditor v-model="replyText" class="editor-body" @submit="handleSend" />
 
     <div class="panel-footer">
       <n-button
         type="primary"
         :loading="sending"
         :disabled="!replyText.trim() || !store.vkTabId"
-        @click="sendReply"
+        @click="handleSend"
       >
-        <template #icon>
-          <n-icon :component="IconSend" />
-        </template>
+        <template #icon><n-icon :component="IconSend" /></template>
         Отправить в VK{{ messageCount > 1 ? ` (${messageCount})` : '' }}
       </n-button>
 
@@ -37,245 +22,45 @@
       </transition>
 
       <div class="footer-right">
-        <div v-if="messageCount > 1" class="delay-settings">
-          <n-switch v-model:value="delayEnabled" size="small" />
-          <span class="delay-label">пауза</span>
-          <template v-if="delayEnabled">
-            <n-input-number
-              v-model:value="delaySec"
-              :min="1"
-              :max="30"
-              :show-button="false"
-              size="small"
-              class="delay-input"
-            />
-            <span class="delay-unit">с</span>
-          </template>
-        </div>
-
+        <DelaySettings v-if="messageCount > 1" ref="delayRef" />
         <div class="stats">
           <span class="stat">{{ replyText.length }}&nbsp;симв.</span>
-          <span class="stat">{{ replyWordCount }}&nbsp;слов</span>
+          <span class="stat">{{ wordCount }}&nbsp;слов</span>
         </div>
       </div>
     </div>
-  </div>
+  </PanelShell>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, h, type Component } from 'vue'
-import { NButton, NIcon, NSwitch, NInputNumber } from 'naive-ui'
+import { ref, computed, h, type Component } from 'vue'
+import { NButton, NIcon } from 'naive-ui'
+import PanelShell from './layout/PanelShell.vue'
+import ReplyEditor from './editor/ReplyEditor.vue'
+import DelaySettings from './editor/DelaySettings.vue'
 import { useMessageStore } from '../stores/message'
-import type { MessageAction, MessageResponse } from '../../types/messages'
+import { useSendReply } from '../composables/useSendReply'
+import { VK_LIMIT } from '../constants'
 
 const store = useMessageStore()
+const { sending, statusMsg, statusType, sendReply } = useSendReply()
 
-// --- Editor state ---
-
-const editorEl = ref<HTMLDivElement | null>(null)
 const replyText = ref('')
-const replyWordCount = computed(() => {
+const delayRef = ref<InstanceType<typeof DelaySettings>>()
+
+const messageCount = computed(() => Math.max(1, Math.ceil(replyText.value.length / VK_LIMIT)))
+const wordCount = computed(() => {
   const t = replyText.value.trim()
   return t ? t.split(/\s+/).length : 0
 })
 
-onMounted(() => editorEl.value?.focus())
-
-// --- VK limit & multi-message ---
-
-const VK_LIMIT = 4096
-const messageCount = computed(() => Math.max(1, Math.ceil(replyText.value.length / VK_LIMIT)))
-
-function splitIntoChunks(text: string): string[] {
-  const chunks: string[] = []
-  for (let i = 0; i < text.length; i += VK_LIMIT) chunks.push(text.slice(i, i + VK_LIMIT))
-  return chunks.length ? chunks : [text]
-}
-
-// --- DOM ↔ plain text ---
-// Structure we maintain: text nodes + <br> (newlines) + .msg-sep divs (separators).
-// white-space: pre-wrap makes Enter insert <br>; paste is intercepted to keep structure clean.
-
-function extractText(el: HTMLElement): string {
-  let text = ''
-  for (const node of el.childNodes) {
-    if (node instanceof Element) {
-      if (node.hasAttribute('data-separator')) continue
-      if (node.tagName === 'BR') { text += '\n'; continue }
-    }
-    if (node.nodeType === Node.TEXT_NODE) text += node.textContent ?? ''
-  }
-  return text
-}
-
-function buildHTML(text: string): string {
-  function escape(s: string) {
-    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')
-  }
-  const count = Math.max(1, Math.ceil(text.length / VK_LIMIT))
-  return Array.from({ length: count }, (_, i) => {
-    const chunk = escape(text.slice(i * VK_LIMIT, (i + 1) * VK_LIMIT))
-    return i === 0 ? chunk : `<div class="msg-sep" contenteditable="false" data-separator>сообщение ${i + 1}</div>${chunk}`
-  }).join('')
-}
-
-// --- Cursor save/restore (char offset in plain text, skipping separators) ---
-
-function saveCaretOffset(el: HTMLElement): number {
-  const sel = window.getSelection()
-  if (!sel?.rangeCount) return 0
-  const { endContainer, endOffset } = sel.getRangeAt(0)
-  let count = 0
-  for (const node of el.childNodes) {
-    if (node instanceof Element && node.hasAttribute('data-separator')) continue
-    if (node === endContainer) { count += endOffset; break }
-    if (node.nodeType === Node.TEXT_NODE) {
-      if (node === endContainer) { count += endOffset; break }
-      count += (node as Text).length
-    } else if (node instanceof Element && node.tagName === 'BR') {
-      count++
-    }
-  }
-  return count
-}
-
-function restoreCaretOffset(el: HTMLElement, target: number) {
-  const sel = window.getSelection()
-  if (!sel) return
-  let remaining = target
-  for (const node of el.childNodes) {
-    if (node instanceof Element && node.hasAttribute('data-separator')) continue
-    if (node.nodeType === Node.TEXT_NODE) {
-      const len = (node as Text).length
-      if (remaining <= len) {
-        const r = document.createRange()
-        r.setStart(node, remaining)
-        r.collapse(true)
-        sel.removeAllRanges()
-        sel.addRange(r)
-        return
-      }
-      remaining -= len
-    } else if (node instanceof Element && node.tagName === 'BR') {
-      if (remaining === 0) {
-        const r = document.createRange()
-        r.setStartBefore(node)
-        r.collapse(true)
-        sel.removeAllRanges()
-        sel.addRange(r)
-        return
-      }
-      remaining--
-    }
-  }
-  const r = document.createRange()
-  r.selectNodeContents(el)
-  r.collapse(false)
-  sel.removeAllRanges()
-  sel.addRange(r)
-}
-
-// --- Input handling ---
-
-let prevMsgCount = 1
-
-function onInput() {
-  const el = editorEl.value
-  if (!el) return
-  const text = extractText(el)
-  replyText.value = text
-  const newCount = Math.max(1, Math.ceil(text.length / VK_LIMIT))
-  if (newCount !== prevMsgCount) {
-    const offset = saveCaretOffset(el)
-    prevMsgCount = newCount
-    el.innerHTML = buildHTML(text)
-    restoreCaretOffset(el, offset)
-  }
-}
-
-function onPaste(e: ClipboardEvent) {
-  const text = e.clipboardData?.getData('text/plain') ?? ''
-  document.execCommand('insertText', false, text)
-}
-
-function onKeydown(e: KeyboardEvent) {
-  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-    e.preventDefault()
-    sendReply()
-  }
-}
-
-// --- Delay settings ---
-
-const delayEnabled = ref(localStorage.getItem('scribe:delayEnabled') !== 'false')
-const delaySec = ref(Number(localStorage.getItem('scribe:delaySec')) || 3)
-
-watch(delayEnabled, v => localStorage.setItem('scribe:delayEnabled', String(v)))
-watch(delaySec, v => localStorage.setItem('scribe:delaySec', String(v)))
-
-// --- Send ---
-
-const sending = ref(false)
-const statusMsg = ref('')
-const statusType = ref<'success' | 'error'>('success')
-let statusTimer: ReturnType<typeof setTimeout> | undefined
-
-function setStatus(msg: string, type: 'success' | 'error') {
-  statusMsg.value = msg
-  statusType.value = type
-  clearTimeout(statusTimer)
-  statusTimer = setTimeout(() => { statusMsg.value = '' }, 3000)
-}
-
-function sleep(ms: number) {
-  return new Promise<void>(resolve => setTimeout(resolve, ms))
-}
-
-async function sendOne(text: string): Promise<MessageResponse> {
-  const msg: MessageAction = { action: 'sendReply', text, vkTabId: store.vkTabId }
-  return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage(msg, (res: MessageResponse) => {
-      if (chrome.runtime.lastError) reject(new Error(chrome.runtime.lastError.message))
-      else resolve(res)
-    })
+async function handleSend() {
+  const success = await sendReply(replyText.value, {
+    delayEnabled: delayRef.value?.enabled ?? false,
+    delaySec: delayRef.value?.seconds ?? 3,
   })
+  if (success) replyText.value = ''
 }
-
-async function sendReply() {
-  const text = replyText.value.trim()
-  if (!text || !store.vkTabId || sending.value) return
-
-  const chunks = splitIntoChunks(text)
-  sending.value = true
-
-  try {
-    for (let i = 0; i < chunks.length; i++) {
-      if (i > 0) {
-        if (delayEnabled.value) {
-          setStatus(`Пауза перед ${i + 1}/${chunks.length}…`, 'success')
-          await sleep(delaySec.value * 1000)
-        } else {
-          setStatus(`Отправка ${i + 1}/${chunks.length}…`, 'success')
-        }
-      }
-      const response = await sendOne(chunks[i])
-      if (!response?.success) {
-        setStatus(response?.error ?? 'Ошибка отправки', 'error')
-        return
-      }
-    }
-    setStatus(chunks.length > 1 ? `Отправлено ${chunks.length} сообщения` : 'Отправлено!', 'success')
-    replyText.value = ''
-    prevMsgCount = 1
-    if (editorEl.value) editorEl.value.innerHTML = ''
-  } catch (err) {
-    setStatus(err instanceof Error ? err.message : 'Ошибка', 'error')
-  } finally {
-    sending.value = false
-  }
-}
-
-// --- Icon ---
 
 const IconSend: Component = () =>
   h('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 24 24', fill: 'currentColor', width: '1em', height: '1em' }, [
@@ -285,64 +70,10 @@ const IconSend: Component = () =>
 
 <style lang="scss" scoped>
 @use '@/styles/variables' as v;
-@use '@/styles/mixins' as m;
 
-.panel {
-  @include m.panel-base;
-  background: v.$bg-panel;
-  transition: background-color 0.2s ease;
-}
-
-.panel-header {
-  @include m.panel-header;
-}
-
-.panel-label {
-  @include m.panel-label;
-}
-
-.panel-body {
+.editor-body {
   flex: 1;
   min-height: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.reply-editor {
-  flex: 1;
-  min-height: 0;
-  padding: v.$gap-lg;
-  overflow-y: auto;
-  color: v.$text;
-  font-family: v.$font-ui;
-  font-size: v.$font-body;
-  line-height: 1.75;
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  outline: none;
-  caret-color: v.$caret;
-  transition: color 0.2s ease, caret-color 0.2s ease;
-
-  &:empty::before {
-    content: attr(data-placeholder);
-    color: v.$placeholder;
-    pointer-events: none;
-  }
-
-  :deep(.msg-sep) {
-    display: block;
-    border-top: 1px dashed v.$warn;
-    margin: 4px 0;
-    font-size: 10px;
-    color: v.$warn;
-    text-align: right;
-    user-select: none;
-    cursor: default;
-    line-height: 1.6;
-    transition: color 0.2s ease, border-color 0.2s ease;
-  }
 }
 
 .panel-footer {
@@ -365,23 +96,6 @@ const IconSend: Component = () =>
   display: flex;
   align-items: center;
   gap: v.$gap-lg;
-}
-
-.delay-settings {
-  display: flex;
-  align-items: center;
-  gap: v.$gap-xs;
-}
-
-.delay-label,
-.delay-unit {
-  font-size: v.$font-label;
-  color: v.$text-dim;
-  transition: color 0.2s ease;
-}
-
-.delay-input {
-  width: 48px;
 }
 
 .stats {
