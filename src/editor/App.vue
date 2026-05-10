@@ -3,10 +3,19 @@
     <n-message-provider>
       <div class="app">
         <AppHeader @open-settings="settingsOpen = true" />
-        <main class="app-panels">
-          <SourcePanel />
-          <EditorPanel />
-        </main>
+        <n-split
+          class="app-panels"
+          v-model:size="settings.splitSize"
+          :min="0.2"
+          :max="0.8"
+        >
+          <template #1>
+            <SourcePanel />
+          </template>
+          <template #2>
+            <EditorPanel />
+          </template>
+        </n-split>
       </div>
       <SettingsModal v-model:show="settingsOpen" />
     </n-message-provider>
@@ -15,7 +24,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { NConfigProvider, NMessageProvider } from 'naive-ui'
+import { NConfigProvider, NMessageProvider, NSplit } from 'naive-ui'
 import { ruRU, dateRuRU } from 'naive-ui'
 import AppHeader from './components/layout/AppHeader.vue'
 import SettingsModal from './components/settings/SettingsModal.vue'

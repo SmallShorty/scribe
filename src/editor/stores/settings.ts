@@ -29,5 +29,9 @@ export const useSettingsStore = defineStore('settings', () => {
   watch(delayEnabled, v => localStorage.setItem('scribe:delayEnabled', String(v)))
   watch(delaySec, v => localStorage.setItem('scribe:delaySec', String(v)))
 
-  return { theme, naiveTheme, delayEnabled, delaySec }
+  // --- Split ---
+  const splitSize = ref(Number(localStorage.getItem('scribe:splitSize')) || 0.5)
+  watch(splitSize, v => localStorage.setItem('scribe:splitSize', String(v)))
+
+  return { theme, naiveTheme, delayEnabled, delaySec, splitSize }
 })
