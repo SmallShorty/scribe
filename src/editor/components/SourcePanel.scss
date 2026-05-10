@@ -1,0 +1,22 @@
+@use '@/styles/variables' as v;
+
+.panel-body {
+  flex: 1;
+  padding: v.$gap-lg;
+}
+
+.message-text {
+  color: v.$text;
+  font-size: v.$font-body;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-break: break-word;
+  transition: color 0.2s ease;
+}
+
+.empty-hint {
+  color: v.$placeholder;
+  font-style: italic;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}

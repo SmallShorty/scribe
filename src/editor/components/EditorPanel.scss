@@ -1,0 +1,52 @@
+@use '@/styles/variables' as v;
+
+.editor-body {
+  flex: 1;
+  min-height: 0;
+}
+
+.panel-footer {
+  display: flex;
+  align-items: center;
+  gap: v.$gap-md;
+  padding: v.$gap-md v.$gap-lg;
+  border-top: 1px solid v.$border;
+  flex-shrink: 0;
+  transition: border-color 0.2s ease;
+}
+
+.hint {
+  font-size: v.$font-label;
+  color: v.$text-dim;
+}
+
+.footer-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: v.$gap-lg;
+}
+
+.stats {
+  display: flex;
+  gap: v.$gap-md;
+}
+
+.stat {
+  font-size: v.$font-label;
+  color: v.$text-dim;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.2s ease;
+}
+
+.status {
+  font-size: v.$font-hint;
+
+  &.success { color: v.$status-ok; }
+  &.error   { color: v.$status-err; }
+}
+
+.fade-enter-active,
+.fade-leave-active { transition: opacity 0.25s; }
+.fade-enter-from,
+.fade-leave-to     { opacity: 0; }

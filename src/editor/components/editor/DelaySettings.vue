@@ -29,23 +29,4 @@ watch(seconds, v => localStorage.setItem('scribe:delaySec', String(v)))
 defineExpose({ enabled, seconds })
 </script>
 
-<style lang="scss" scoped>
-@use '@/styles/variables' as v;
-
-.delay-settings {
-  display: flex;
-  align-items: center;
-  gap: v.$gap-xs;
-}
-
-.label,
-.unit {
-  font-size: v.$font-label;
-  color: v.$text-dim;
-  transition: color 0.2s ease;
-}
-
-.input {
-  width: 48px;
-}
-</style>
+<style lang="scss" scoped src="./DelaySettings.scss"></style>

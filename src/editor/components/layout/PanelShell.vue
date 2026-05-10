@@ -14,25 +14,4 @@ withDefaults(defineProps<{
 }>(), { variant: 'panel' })
 </script>
 
-<style lang="scss" scoped>
-@use '@/styles/variables' as v;
-@use '@/styles/mixins' as m;
-
-.panel-shell {
-  @include m.panel-base;
-  background: v.$bg-panel;
-  transition: background-color 0.2s ease;
-
-  &--source {
-    background: v.$bg-source;
-  }
-}
-
-.panel-header {
-  @include m.panel-header;
-}
-
-.panel-label {
-  @include m.panel-label;
-}
-</style>
+<style lang="scss" scoped src="./PanelShell.scss"></style>

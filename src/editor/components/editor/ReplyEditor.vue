@@ -155,40 +155,4 @@ watch(() => props.modelValue, (newVal) => {
 })
 </script>
 
-<style lang="scss" scoped>
-@use '@/styles/variables' as v;
-
-.reply-editor {
-  padding: v.$gap-lg;
-  overflow-y: auto;
-  color: v.$text;
-  font-family: v.$font-ui;
-  font-size: v.$font-body;
-  line-height: 1.75;
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  outline: none;
-  caret-color: v.$caret;
-  transition: color 0.2s ease, caret-color 0.2s ease;
-
-  &:empty::before {
-    content: attr(data-placeholder);
-    color: v.$placeholder;
-    pointer-events: none;
-  }
-
-  :deep(.msg-sep) {
-    display: block;
-    border-top: 1px dashed v.$warn;
-    margin: 4px 0;
-    font-size: 10px;
-    color: v.$warn;
-    text-align: right;
-    user-select: none;
-    cursor: default;
-    line-height: 1.6;
-    transition: color 0.2s ease, border-color 0.2s ease;
-  }
-}
-</style>
+<style lang="scss" scoped src="./ReplyEditor.scss"></style>

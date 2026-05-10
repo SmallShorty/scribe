@@ -28,22 +28,4 @@ const themeStore = useThemeStore()
 onMounted(() => store.loadFromUrl())
 </script>
 
-<style lang="scss">
-@use '@/styles/variables' as v;
-
-.app {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-.app-panels {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  flex: 1;
-  overflow: hidden;
-  gap: 1px;
-  background: v.$border;
-  transition: background-color 0.2s ease;
-}
-</style>
+<style lang="scss" src="./App.scss"></style>
