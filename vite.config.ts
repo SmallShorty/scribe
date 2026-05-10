@@ -4,6 +4,8 @@ import { crx } from '@crxjs/vite-plugin'
 import { fileURLToPath, URL } from 'node:url'
 import manifest from './manifest.json'
 
+const srcPath = fileURLToPath(new URL('./src', import.meta.url))
+
 export default defineConfig({
   plugins: [
     vue(),
@@ -12,14 +14,21 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        // Редактор-вкладка — дополнительная HTML-точка входа, не описанная в manifest
         editor: fileURLToPath(new URL('./src/editor/index.html', import.meta.url)),
       },
     },
   },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@': srcPath,
+    },
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern',
+        loadPaths: [srcPath],
+      },
     },
   },
 })

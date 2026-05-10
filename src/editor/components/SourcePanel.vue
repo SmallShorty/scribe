@@ -16,7 +16,6 @@
       </p>
       <p v-else class="message-text">{{ store.sourceText }}</p>
     </n-scrollbar>
-
   </div>
 </template>
 
@@ -43,49 +42,42 @@ async function copyText() {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use '@/styles/variables' as v;
+@use '@/styles/mixins' as m;
+
 .panel {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-  background: #1a1a1f;
+  @include m.panel-base;
+  background: v.$bg-source;
+  transition: background-color 0.2s ease;
 }
 
 .panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 16px;
-  border-bottom: 1px solid #2a2a30;
-  flex-shrink: 0;
+  @include m.panel-header;
 }
 
 .panel-label {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: #7c7c8a;
+  @include m.panel-label;
 }
 
 .panel-body {
   flex: 1;
-  padding: 16px;
+  padding: v.$gap-lg;
 }
 
 .message-text {
-  color: #e0e0e6;
-  font-size: 15px;
+  color: v.$text;
+  font-size: v.$font-body;
   line-height: 1.75;
   white-space: pre-wrap;
   word-break: break-word;
+  transition: color 0.2s ease;
 }
 
 .empty-hint {
-  color: #4a4a56;
+  color: v.$placeholder;
   font-style: italic;
   font-size: 14px;
+  transition: color 0.2s ease;
 }
-
 </style>

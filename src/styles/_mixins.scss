@@ -1,0 +1,31 @@
+@use 'variables' as v;
+
+@mixin panel-base {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+@mixin panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: v.$gap-sm v.$gap-lg;
+  border-bottom: 1px solid v.$border;
+  flex-shrink: 0;
+}
+
+@mixin panel-label {
+  font-size: v.$font-label;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: v.$text-muted;
+}
+
+@mixin flex-center($gap: 0) {
+  display: flex;
+  align-items: center;
+  @if $gap != 0 { gap: $gap; }
+}

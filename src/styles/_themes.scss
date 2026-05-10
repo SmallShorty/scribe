@@ -1,0 +1,37 @@
+html.theme-dark {
+  color-scheme: dark;
+
+  --bg-app:      #101014;
+  --bg-panel:    #1e1e26;
+  --bg-source:   #1a1a1f;
+  --border:      #2a2a30;
+  --accent:      #63e2b7;
+  --text:        #e0e0e6;
+  --text-muted:  #7c7c8a;
+  --text-dim:    #56565e;
+  --warn:        #d4a017;
+  --placeholder: #46464e;
+  --caret:       #63e2b7;
+  --header-bg:   #101014;
+  --status-ok:   #63e2b7;
+  --status-err:  #e07070;
+}
+
+html.theme-light {
+  color-scheme: light;
+
+  --bg-app:      #e9e9f2;
+  --bg-panel:    #f8f8fd;
+  --bg-source:   #f0f0f8;
+  --border:      #ccccd8;
+  --accent:      #0c7a53;
+  --text:        #1c1c28;
+  --text-muted:  #686878;
+  --text-dim:    #9898a8;
+  --warn:        #9a7010;
+  --placeholder: #b0b0c4;
+  --caret:       #0c7a53;
+  --header-bg:   #dddde8;
+  --status-ok:   #0c7a53;
+  --status-err:  #c0393b;
+}

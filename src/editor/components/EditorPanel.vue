@@ -168,7 +168,6 @@ function restoreCaretOffset(el: HTMLElement, target: number) {
       remaining--
     }
   }
-  // Fallback: place at end
   const r = document.createRange()
   r.selectNodeContents(el)
   r.collapse(false)
@@ -284,30 +283,22 @@ const IconSend: Component = () =>
   ])
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use '@/styles/variables' as v;
+@use '@/styles/mixins' as m;
+
 .panel {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-  background: #1e1e26;
+  @include m.panel-base;
+  background: v.$bg-panel;
+  transition: background-color 0.2s ease;
 }
 
 .panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 16px;
-  border-bottom: 1px solid #2a2a30;
-  flex-shrink: 0;
+  @include m.panel-header;
 }
 
 .panel-label {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: #7c7c8a;
+  @include m.panel-label;
 }
 
 .panel-body {
@@ -321,98 +312,96 @@ const IconSend: Component = () =>
 .reply-editor {
   flex: 1;
   min-height: 0;
-  padding: 16px;
-  box-sizing: border-box;
+  padding: v.$gap-lg;
   overflow-y: auto;
-  color: #e0e0e6;
-  font-family: 'Roboto', sans-serif;
-  font-size: 15px;
+  color: v.$text;
+  font-family: v.$font-ui;
+  font-size: v.$font-body;
   line-height: 1.75;
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: break-word;
   outline: none;
-  caret-color: #63e2b7;
-}
+  caret-color: v.$caret;
+  transition: color 0.2s ease, caret-color 0.2s ease;
 
-.reply-editor:empty::before {
-  content: attr(data-placeholder);
-  color: #46464e;
-  pointer-events: none;
-}
+  &:empty::before {
+    content: attr(data-placeholder);
+    color: v.$placeholder;
+    pointer-events: none;
+  }
 
-/* Separator rendered as inline part of text flow */
-.reply-editor :deep(.msg-sep) {
-  display: block;
-  border-top: 1px dashed #d4a017;
-  margin: 4px 0;
-  font-size: 10px;
-  color: #d4a017;
-  text-align: right;
-  padding-right: 0;
-  user-select: none;
-  cursor: default;
-  line-height: 1.6;
+  :deep(.msg-sep) {
+    display: block;
+    border-top: 1px dashed v.$warn;
+    margin: 4px 0;
+    font-size: 10px;
+    color: v.$warn;
+    text-align: right;
+    user-select: none;
+    cursor: default;
+    line-height: 1.6;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
 }
 
 .panel-footer {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-top: 1px solid #2a2a30;
+  gap: v.$gap-md;
+  padding: v.$gap-md v.$gap-lg;
+  border-top: 1px solid v.$border;
   flex-shrink: 0;
+  transition: border-color 0.2s ease;
 }
 
 .hint {
-  font-size: 11px;
-  color: #46464e;
+  font-size: v.$font-label;
+  color: v.$text-dim;
 }
 
 .footer-right {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: v.$gap-lg;
 }
 
 .delay-settings {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: v.$gap-xs;
 }
 
-.delay-label {
-  font-size: 11px;
-  color: #56565e;
+.delay-label,
+.delay-unit {
+  font-size: v.$font-label;
+  color: v.$text-dim;
+  transition: color 0.2s ease;
 }
 
 .delay-input {
   width: 48px;
 }
 
-.delay-unit {
-  font-size: 11px;
-  color: #56565e;
-}
-
 .stats {
   display: flex;
-  gap: 12px;
+  gap: v.$gap-md;
 }
 
 .stat {
-  font-size: 11px;
-  color: #56565e;
+  font-size: v.$font-label;
+  color: v.$text-dim;
   font-variant-numeric: tabular-nums;
+  transition: color 0.2s ease;
 }
 
 .status {
-  font-size: 13px;
-}
+  font-size: v.$font-hint;
 
-.status.success { color: #63e2b7; }
-.status.error   { color: #e07070; }
+  &.success { color: v.$status-ok; }
+  &.error   { color: v.$status-err; }
+}
 
 .fade-enter-active,
 .fade-leave-active { transition: opacity 0.25s; }

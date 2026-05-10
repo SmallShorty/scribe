@@ -1,0 +1,30 @@
+// Color tokens — reference CSS custom properties set by the active theme
+$bg-app:      var(--bg-app);
+$bg-panel:    var(--bg-panel);
+$bg-source:   var(--bg-source);
+$border:      var(--border);
+$accent:      var(--accent);
+$text:        var(--text);
+$text-muted:  var(--text-muted);
+$text-dim:    var(--text-dim);
+$warn:        var(--warn);
+$placeholder: var(--placeholder);
+$caret:       var(--caret);
+$header-bg:   var(--header-bg);
+$status-ok:   var(--status-ok);
+$status-err:  var(--status-err);
+
+// Static tokens
+$font-ui:     'Roboto', sans-serif;
+$font-header: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+$gap-xs:  6px;
+$gap-sm:  10px;
+$gap-md:  12px;
+$gap-lg:  16px;
+$gap-xl:  20px;
+
+$height-header: 46px;
+$font-label:    11px;
+$font-body:     15px;
+$font-hint:     13px;
