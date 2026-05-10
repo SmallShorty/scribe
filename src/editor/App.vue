@@ -3,19 +3,28 @@
     <n-message-provider>
       <div class="app">
         <AppHeader @open-settings="settingsOpen = true" />
+
         <n-split
+          v-if="settings.layout !== 'source-hidden'"
           class="app-panels"
           v-model:size="settings.splitSize"
+          :direction="settings.layout === 'horizontal' ? 'vertical' : 'horizontal'"
           :min="0.2"
           :max="0.8"
         >
           <template #1>
-            <SourcePanel />
+            <SourcePanel v-if="!settings.swapped" />
+            <EditorPanel v-else />
           </template>
           <template #2>
-            <EditorPanel />
+            <EditorPanel v-if="!settings.swapped" />
+            <SourcePanel v-else />
           </template>
         </n-split>
+
+        <div v-else class="app-panels">
+          <EditorPanel />
+        </div>
       </div>
       <SettingsModal v-model:show="settingsOpen" />
     </n-message-provider>

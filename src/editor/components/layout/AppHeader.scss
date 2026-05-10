@@ -26,8 +26,18 @@
   transition: color 0.2s ease;
 }
 
-.icon-btn {
+.layout-group {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 8px;
+  background: v.$border;
+  transition: background-color 0.2s ease;
+}
+
+.icon-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,7 +51,17 @@
   transition: background-color 0.15s ease, color 0.15s ease;
 
   &:hover {
-    background: v.$border;
+    background: v.$bg-panel;
     color: v.$text;
   }
+
+  &--active {
+    background: v.$bg-panel;
+    color: v.$accent;
+  }
+}
+
+// settings gear — sits directly after layout-group, no extra auto-margin
+.layout-group + .icon-btn {
+  margin-left: v.$gap-sm;
 }

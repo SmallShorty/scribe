@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import { darkTheme, type GlobalTheme } from 'naive-ui'
 
 export type Theme = 'dark' | 'light'
+export type Layout = 'vertical' | 'horizontal' | 'source-hidden'
 
 export const useSettingsStore = defineStore('settings', () => {
   // --- Theme ---
@@ -33,5 +34,13 @@ export const useSettingsStore = defineStore('settings', () => {
   const splitSize = ref(Number(localStorage.getItem('scribe:splitSize')) || 0.5)
   watch(splitSize, v => localStorage.setItem('scribe:splitSize', String(v)))
 
-  return { theme, naiveTheme, delayEnabled, delaySec, splitSize }
+  // --- Layout ---
+  const layout = ref<Layout>((localStorage.getItem('scribe:layout') as Layout) ?? 'vertical')
+  watch(layout, v => localStorage.setItem('scribe:layout', v))
+
+  // --- Swap ---
+  const swapped = ref(localStorage.getItem('scribe:swapped') === 'true')
+  watch(swapped, v => localStorage.setItem('scribe:swapped', String(v)))
+
+  return { theme, naiveTheme, delayEnabled, delaySec, splitSize, layout, swapped }
 })
